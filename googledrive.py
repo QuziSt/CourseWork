@@ -40,12 +40,13 @@ class GoogleDriveClass:
 		
 		gauth = GoogleAuth()
 		gauth.LocalWebserverAuth()
+		folder_id = input('кажите ID папки в диске:\n')
 		
 		bar2 = IncrementalBar('Загрузка файлов на Google Drive', max=len(os.listdir(self.directory)))
 		drive = GoogleDrive(gauth)
 		for file_name in os.listdir(self.directory):
 			bar2.next()
-			file = drive.CreateFile({'parents': [{'id': '1qpWu7PbQct3iuWWNA_lcsadbTUWDQoHC'}]})
+			file = drive.CreateFile({'parents': [{'id': f'{folder_id}'}]})
 			file.SetContentFile(os.path.join(self.directory, file_name))
 			file.Upload()
 			time.sleep(0.33)
