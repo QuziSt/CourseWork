@@ -2,12 +2,31 @@ from pick import pick
 from yadisk import YaDisk
 from googledrive import GoogleDriveClass
 import os
+import configparser
+import json
+
 
 def start_programm():
 	commands = {'Яндекс.Диск': ya_disk,
 	            'Гугл Диск': google_disk}
 	answer, index = pick(['Яндекс.Диск', 'Гугл Диск'], 'Куда загрузить фотографии?', indicator='=>')
 	commands[answer]()
+	
+	
+def create_json(some_json):
+	data = some_json
+	json_result = []
+	photos_names = []
+	for i in list(data):
+		photo_info = {}
+		if data[i][0] in photos_names:
+			photo_info = {'file_name': data[i][1], 'size': data[i][-1]}
+		else:
+			photo_info = {'file_name': data[i][0], 'size': data[i][-1]}
+			photos_names.append(data[i][0])
+		json_result.append(photo_info)
+	with open('all_photos.json', 'w') as result:
+		json.dump(json_result, result, indent=4)
 	
 	
 def google_disk():
@@ -18,8 +37,12 @@ def google_disk():
 	
 def ya_disk():
 	os.system('cls||clear')
-	access_yadisk_token = input('Введите токен yandex:\n')
-	yadisk = YaDisk(access_yadisk_token)
+	config = configparser.ConfigParser()
+	config.read('tokens.ini')
+	access_yadisk_token = config['Yandex']['ya_token']
+	folder_name = input('Введите название папки, куда сохранить фотографии:\n')
+	yadisk = YaDisk(access_yadisk_token, folder_name)
+	yadisk.create_folder()
 	yadisk.upload_photos()
 	
 	

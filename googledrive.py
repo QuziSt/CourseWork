@@ -5,7 +5,8 @@ from vk import VK
 from progress.bar import IncrementalBar
 import os
 import time
-import json
+from pick import pick
+import configparser
 
 
 class GoogleDriveClass:
@@ -13,16 +14,24 @@ class GoogleDriveClass:
 		self.directory = directory
 		
 	def create_and_upload(self):
-		access_vk_token = input('Введите токен VK')
-		user_id = input('Введите ID пользователя Вконтакте:\n')
-		vk = VK(access_vk_token, user_id)
+		config = configparser.ConfigParser()
+		config.read('tokens.ini')
+		access_vk_token = config['vk']['vk_token']
+		user_id = input('Введите ID пользователя Вконтакте или короткое имя профиля:\n')
+		count = input('Какое количество фотографий Вы хотите получить?\n')
+		while not count.isdigit():
+			count = input('Какое количество фотографий Вы хотите получить?\n')
+		where_from = {'Профиль': 'profile',
+		              'Стена': 'wall',
+		              'Сохраненные': 'saved'}
+		where, index = pick(list(where_from.keys()), 'Откуда взять фотографии?', indicator='=>')
+		album = where_from[where]
+		vk = VK(access_vk_token, user_id, count, album)
 		data = vk.all_photos()
 		bar1 = IncrementalBar('Загрузка файлов на компьютер', max=len(data))
-		json_result = []
 		photos_names = []
 		for i in list(data):
 			bar1.next()
-			photo_info = {}
 			photo_url = i
 			photo = requests.get(photo_url)
 			if data[i][0] in photos_names:
@@ -31,16 +40,13 @@ class GoogleDriveClass:
 			else:
 				with open(f'vk_photos/{data[i][0]}.jpg', 'wb') as where_to_save_on_pc:
 					where_to_save_on_pc.write(photo.content)
-			json_result.append(photo_info)
 			time.sleep(0.33)
-		with open(f'vk_photos/json_result.json', 'w') as where_to_save_on_pc:
-			json.dump(json_result, where_to_save_on_pc)
 		bar1.finish()
 		print('Загрузка завершена.')
 		
 		gauth = GoogleAuth()
 		gauth.LocalWebserverAuth()
-		folder_id = input('кажите ID папки в диске:\n')
+		folder_id = input('Укажите ID папки в диске:\n')
 		
 		bar2 = IncrementalBar('Загрузка файлов на Google Drive', max=len(os.listdir(self.directory)))
 		drive = GoogleDrive(gauth)
