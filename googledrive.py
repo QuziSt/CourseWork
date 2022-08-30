@@ -1,7 +1,7 @@
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 import requests
-from vk import VK
+from vk import *
 from progress.bar import IncrementalBar
 import os
 import time

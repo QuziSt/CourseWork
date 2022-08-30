@@ -1,5 +1,5 @@
 from pick import pick
-from yadisk import YaDisk
+from yadisk import *
 from googledrive import GoogleDriveClass
 import os
 import configparser

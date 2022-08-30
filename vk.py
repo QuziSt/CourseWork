@@ -1,4 +1,6 @@
 import requests
+from main import create_json
+
 
 class VK:
 	def __init__(self, token, user_id, count=5, album='profile', version='5.131'):
@@ -31,6 +33,7 @@ class VK:
 		for photo in data['response']['items']:
 			photo_urls.setdefault(photo['sizes'][-1]['url'], [photo['likes']['count'], photo['date'],
 		                                           photo['sizes'][-1]['type']])
+		create_json(photo_urls)
 		return photo_urls
 
 		

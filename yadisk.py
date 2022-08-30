@@ -1,11 +1,11 @@
-from vk import VK
+from vk import *
 import requests
 import time
 import os
 from progress.bar import IncrementalBar
 import configparser
 from pick import pick
-import main
+
 
 class YaDisk:
 	def __init__(self, token, folder_name):
